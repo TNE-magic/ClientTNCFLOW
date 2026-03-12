@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Creative Brief — Custom Event Magic</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c8a96e;
+    --gold-dim: #8b7355;
+    --bg: #0e0c08;
+    --bg-2: #0b0908;
+    --border: #2a2218;
+    --border-mid: #3a3020;
+    --text: #e8dcc8;
+    --muted: #6a5d45;
+    --muted-2: #4a3d25;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    padding: 48px 32px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #141008 0%, var(--bg) 100%);
+  }
+  .header-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-size: clamp(26px, 6vw, 42px);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+  .header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  /* Progress */
+  .progress-bar-wrap {
+    height: 2px;
+    background: var(--border);
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+
+  /* Nav tabs */
+  .section-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+    -webkit-overflow-scrolling: touch;
+  }
+  .section-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 14px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* Form */
+  .form-body {
+    padding: 36px 32px 40px;
+    max-width: 680px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Question */
+  .question { margin-bottom: 28px; }
+  .q-label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .q-hint {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 15px;
+    transition: border-color 0.2s;
+  }
+  input[type="text"] {
+    border-bottom: 1px solid var(--border-mid);
+    padding: 6px 0;
+  }
+  input[type="text"]:focus { border-bottom-color: var(--gold-dim); }
+  textarea {
+    border: 1px solid var(--border-mid);
+    border-radius: 3px;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 80px;
+  }
+  textarea:focus { border-color: var(--gold-dim); }
+  ::placeholder { color: var(--muted-2); }
+
+  /* Radio options */
+  .radio-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid var(--border-mid);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .radio-option input[type="radio"] { display: none; }
+  .radio-option.selected {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(200,169,110,0.06);
+  }
+
+  /* File note */
+  .file-note {
+    border: 1px dashed var(--gold-dim);
+    border-radius: 4px;
+    padding: 14px 18px;
+    background: rgba(139,115,85,0.05);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+  .file-note span { color: var(--gold); }
+  .file-note textarea {
+    margin-top: 10px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 4px 0;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  /* Navigation */
+  .form-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted-2);
+    letter-spacing: 0.1em;
+  }
+  .btn {
+    background: none;
+    border: 1px solid var(--border-mid);
+    color: var(--muted);
+    padding: 10px 22px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .btn:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+  .btn-primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: #dbbe87; border-color: #dbbe87; color: var(--bg); }
+
+  /* Thank you */
+  .thankyou {
+    display: none;
+    padding: 60px 32px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .thankyou.active { display: block; }
+  .thankyou .icon { font-size: 36px; margin-bottom: 20px; }
+  .thankyou h2 { font-size: 28px; font-weight: 300; color: var(--gold); margin-bottom: 12px; }
+  .thankyou p { color: var(--muted); font-style: italic; font-size: 15px; line-height: 1.7; }
+
+  @media (max-width: 480px) {
+    .header, .form-body { padding-left: 20px; padding-right: 20px; }
+    .tab-btn { padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Custom Event Magic — Client Intake</div>
+  <h1>The Creative Brief</h1>
+  <p>The more detail you share, the more personal and impossible to forget the experience becomes. Takes about 5–10 minutes.</p>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar" style="width:25%"></div>
+</div>
+
+<div class="section-tabs" id="sectionTabs">
+  <button class="tab-btn active" onclick="goTo(0)">◈ Brand</button>
+  <button class="tab-btn" onclick="goTo(1)">◉ Event</button>
+  <button class="tab-btn" onclick="goTo(2)">◎ People</button>
+  <button class="tab-btn" onclick="goTo(3)">◇ Logistics</button>
+</div>
+
+<div class="form-body">
+
+  <!-- Section 1: Brand -->
+  <div class="section active" id="sec-0">
+    <div class="section-title">01 — Brand Identity</div>
+
+    <div class="question">
+      <label class="q-label">Company / Client Name</label>
+      <input type="text" placeholder="e.g. Acme Corp">
+    </div>
+    <div class="question">
+      <label class="q-label">Brand Colors</label>
+      <span class="q-hint">Hex codes, Pantone, or just describe them</span>
+      <input type="text" placeholder="e.g. #1A1A2E, Navy, Gold">
+    </div>
+    <div class="question">
+      <label class="q-label">Logo / Brand Guide</label>
+      <span class="q-hint">Upload a file or paste a link to a shared folder</span>
+      <div class="file-note">
+        Please email assets to <span>noah@[yourdomain].com</span> or include a link below ↓
+        <textarea placeholder="https://drive.google.com/..."></textarea>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">Brand Keywords & Messaging</label>
+      <span class="q-hint">Taglines, mission statements, core pillars — the words that show up in your marketing</span>
+      <textarea placeholder="e.g. Innovation, Precision, Human-Centered"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Company Values</label>
+      <span class="q-hint">Official or unofficial — what does your team genuinely stand for?</span>
+      <textarea placeholder="e.g. Integrity, collaboration, pushing boundaries"></textarea>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn" disabled>← Back</button>
+      <span class="counter">1 of 4</span>
+      <button class="btn btn-primary" onclick="goTo(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Section 2: Event -->
+  <div class="section" id="sec-1">
+    <div class="section-title">02 — The Event</div>
+
+    <div class="question">
+      <label class="q-label">Event Name or Theme</label>
+      <input type="text" placeholder="e.g. Q4 Sales Kickoff / The Future Forward Summit">
+    </div>
+    <div class="question">
+      <label class="q-label">What is the #1 goal of this event?</label>
+      <span class="q-hint">Celebrate a win, launch a product, motivate the team, impress clients?</span>
+      <textarea placeholder="e.g. Celebrate record sales and energize the team for Q1"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Approximate Audience Size</label>
+      <input type="text" placeholder="e.g. 200–250 attendees">
+    </div>
+    <div class="question">
+      <label class="q-label">Who is in the room?</label>
+      <span class="q-hint">Mix of roles, seniority levels, internal vs. external guests</span>
+      <textarea placeholder="e.g. Sales reps, regional managers, a handful of VIP clients"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Desired Energy / Tone</label>
+      <span class="q-hint">How should people feel walking out?</span>
+      <div class="radio-group" id="energy-group">
+        <label class="radio-option" onclick="selectRadio(this,'energy-group')"><input type="radio" name="energy">Pumped up &amp; motivated</label>
+        <label class="radio-option" onclick="selectRadio(this,'energy-group')"><input type="radio" name="energy">Impressed &amp; talking about it</label>
+        <label class="radio-option" onclick="selectRadio(this,'energy-group')"><input type="radio" name="energy">Warm &amp; connected</label>
+        <label class="radio-option" onclick="selectRadio(this,'energy-group')"><input type="radio" name="energy">Blown away / speechless</label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">Anything to avoid?</label>
+      <span class="q-hint">Topics, names, themes, or humor styles that would be off-limits</span>
+      <textarea placeholder="e.g. Avoid referencing last year's layoffs, keep it PG"></textarea>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn" onclick="goTo(0)">← Back</button>
+      <span class="counter">2 of 4</span>
+      <button class="btn btn-primary" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Section 3: People -->
+  <div class="section" id="sec-2">
+    <div class="section-title">03 — The People</div>
+
+    <div class="question">
+      <label class="q-label">Who will be on stage or spotlighted?</label>
+      <span class="q-hint">Names, titles, and roles — these are the people I may feature in a custom piece</span>
+      <textarea placeholder="e.g. CEO Jane Smith, VP of Sales Tom Rivera"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Any personal details about those individuals?</label>
+      <span class="q-hint">Hobbies, fun facts, known quirks, recent wins — anything that would delight the room if referenced</span>
+      <textarea placeholder="e.g. Jane is obsessed with golf, Tom just became a grandfather"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Any inside language, jokes, or references?</label>
+      <span class="q-hint">Team nicknames, running jokes, a phrase the CEO always says — these make magic feel personal</span>
+      <textarea placeholder="e.g. The team calls themselves 'The Wolves', the boss always says 'Let's move the needle'"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Recent Company Wins or Milestones</label>
+      <span class="q-hint">Product launches, record quarters, anniversaries — anything worth celebrating or referencing</span>
+      <textarea placeholder="e.g. Just crossed $10M ARR, celebrating 20 years in business"></textarea>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn" onclick="goTo(1)">← Back</button>
+      <span class="counter">3 of 4</span>
+      <button class="btn btn-primary" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Section 4: Logistics -->
+  <div class="section" id="sec-3">
+    <div class="section-title">04 — Logistics</div>
+
+    <div class="question">
+      <label class="q-label">Where does the entertainment fit in the program?</label>
+      <div class="radio-group" id="slot-group">
+        <label class="radio-option" onclick="selectRadio(this,'slot-group')"><input type="radio" name="slot">Opening / Kickoff</label>
+        <label class="radio-option" onclick="selectRadio(this,'slot-group')"><input type="radio" name="slot">After dinner / main program</label>
+        <label class="radio-option" onclick="selectRadio(this,'slot-group')"><input type="radio" name="slot">Between speakers</label>
+        <label class="radio-option" onclick="selectRadio(this,'slot-group')"><input type="radio" name="slot">Closing / Send-off</label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">Approximate Performance Length</label>
+      <input type="text" placeholder="e.g. 30 minutes, 45 minutes">
+    </div>
+    <div class="question">
+      <label class="q-label">Anything else we should know?</label>
+      <span class="q-hint">Surprises planned, special guests, sensitive dynamics, or any context that would help create something unforgettable</span>
+      <textarea placeholder="Open field — no detail is too small" style="min-height:100px"></textarea>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn" onclick="goTo(2)">← Back</button>
+      <span class="counter">4 of 4</span>
+      <button class="btn btn-primary" onclick="submit()">Submit ◈</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Thank you -->
+<div class="thankyou" id="thankyou">
+  <div class="icon">◈</div>
+  <h2>Thank you.</h2>
+  <p>Your brief has been received. Expect to hear back within 48 hours with initial ideas and any follow-up questions.</p>
+</div>
+
+<script>
+  let current = 0;
+  const total = 4;
+
+  function goTo(index) {
+    document.getElementById('sec-' + current).classList.remove('active');
+    document.querySelectorAll('.tab-btn')[current].classList.remove('active');
+    current = index;
+    document.getElementById('sec-' + current).classList.add('active');
+    document.querySelectorAll('.tab-btn')[current].classList.add('active');
+    document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function selectRadio(el, groupId) {
+    document.querySelectorAll('#' + groupId + ' .radio-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function submit() {
+    document.querySelector('.form-body').style.display = 'none';
+    document.querySelector('.section-tabs').style.display = 'none';
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('thankyou').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
